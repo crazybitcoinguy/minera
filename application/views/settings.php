@@ -384,6 +384,8 @@
 														<option value="bfgminer" <?php if ($minerdSoftware == "bfgminer") : ?>selected<?php endif; ?>>BFGminer 4.x (Official)</option>
 														<option value="cgminer" <?php if ($minerdSoftware == "cgminer") : ?>selected<?php endif; ?>>CGminer 4.x (Official)</option>
 														<option value="cgdmaxlzeus" <?php if ($minerdSoftware == "cgdmaxlzeus") : ?>selected<?php endif; ?>>CGminer (Dmax Zeus fork)</option>
+														<option value="cgRM" <?php if ($minerdSoftware == "cgRM") : ?>selected<?php endif; ?>>CGminer (RockMiner fork)</option>
+														<option value="cgAM" <?php if ($minerdSoftware == "cgAM") : ?>selected<?php endif; ?>>CGminer (ASICMiner fork)</option>
 													</select>
 													<h6>Pay attention: Minera is not responsible of any problem related to the miner software you are using. Minera acts only as frontend to manage the miner software. Please refer to miner software's related authors if you have question about them and how to use them.</h6>
 												</div>

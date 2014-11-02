@@ -40,6 +40,18 @@ CGMINER_PATH="$SOURCE_PATH/cgminer"
 CGMINER_CONFIG="--enable-avalon2 --enable-bab --enable-bflsc --enable-bitforce --enable-bitfury --enable-bitmine_A1 --enable-drillbit --enable-hashfast --enable-icarus --enable-klondike --enable-knc --enable-modminer"
 CGMINER_BINARY="cgminer"
 CGMINER_MINERA_BINARY="cgminer"
+
+CGMINER_RM_REPO="https://github.com/rockminerinc/cgminer.git"
+CGMINER_RM_PATH="$SOURCE_PATH/cgminer-RM"
+CGMINER_RM_CONFIG="--enable-icarus"
+CGMINER_RM_BINARY="cgminer"
+CGMINER_RM_MINERA_BINARY="cgminer-RM"
+
+CGMINER_AM_REPO="https://github.com/blockerupter/cgminer.git"
+CGMINER_AM_PATH="$SOURCE_PATH/cgminer-AM"
+CGMINER_AM_CONFIG="--enable-blockerupter --enable-icarus --without-curses"
+CGMINER_AM_BINARY="cgminer"
+CGMINER_AM_MINERA_BINARY="cgminer-AM"
  
 function buildMiner {
 	if [[ $LINK_ONLY -eq 0 ]]; then
@@ -53,7 +65,11 @@ function buildMiner {
 			git clone $BUILD_REPO $BUILD_PATH 
 			cd $BUILD_PATH
 		fi
-		./autogen.sh
+		if [[ $MINERA_BINARY = "cgminer-RM" ]]; then
+                	autoreconf --force --install
+		else
+			./autogen.sh
+		fi
 		echo "Running ./configure $BUILD_CONFIG"
 		./configure ${BUILD_CONFIG}
 		make
@@ -70,7 +86,7 @@ function buildMiner {
 	fi
 }
  
-ARGS="${@/%all/cpuminer bfgminer cgminer-dmaxl cgminer}"
+ARGS="${@/%all/cpuminer bfgminer cgminer-dmaxl cgminer cgminer-RM cgminer-AM}"
  
 if [[ -d "$SOURCE_PATH" ]]; then
 	for OPT in $ARGS; do
@@ -78,7 +94,7 @@ if [[ -d "$SOURCE_PATH" ]]; then
 		if [[ $OPT = "-l" ]]; then
 			LINK_ONLY=1
 		elif [[ $OPT = "all" ]]; then
-			ARGS="cpuminer bfgminer cgminer-dmaxl cgminer"
+			ARGS="cpuminer bfgminer cgminer-dmaxl cgminer cgminer-RM cgminer-AM"
 		elif [[ $OPT = "cpuminer" ]]; then
 			BUILD_REPO=$CPUMINER_REPO
 			BUILD_PATH=$CPUMINER_PATH
@@ -107,6 +123,20 @@ if [[ -d "$SOURCE_PATH" ]]; then
 			BUILD_BINARY=$CGMINER_BINARY
 			MINERA_BINARY=$CGMINER_MINERA_BINARY
 			BUILD_OK=1
+                elif [[ $OPT = "cgminer-RM" ]]; then
+                        BUILD_REPO=$CGMINER_RM_REPO
+                        BUILD_PATH=$CGMINER_RM_PATH
+                        BUILD_CONFIG=$CGMINER_RM_CONFIG
+                        BUILD_BINARY=$CGMINER_RM_BINARY
+                        MINERA_BINARY=$CGMINER_RM_MINERA_BINARY
+                        BUILD_OK=1
+                elif [[ $OPT = "cgminer-AM" ]]; then
+                        BUILD_REPO=$CGMINER_AM_REPO
+                        BUILD_PATH=$CGMINER_AM_PATH
+                        BUILD_CONFIG=$CGMINER_AM_CONFIG
+                        BUILD_BINARY=$CGMINER_AM_BINARY
+                        MINERA_BINARY=$CGMINER_AM_MINERA_BINARY
+                        BUILD_OK=1
 		else
 			echo "Option not recognized = $OPT"
 			BUILD_OK=0
@@ -126,6 +156,8 @@ if [[ -d "$SOURCE_PATH" ]]; then
 			echo "  cpuminer          cpuminer GC3355 fork"
 			echo "  bfgminer          bfgminer official"
 			echo "  cgminer-dmaxl     cgminer dmaxl fork (gridseed and zeus support)"
+                        echo "  cgminer-RM     cgminer RockMiner fork (RBox, NEW RBOX, RK, R2, R3)"
+                        echo "  cgminer-AM     cgminer ASICMiner fork (Prisma and Tube support)"
 			echo "  all               build all the above"
 			echo ""
 	fi

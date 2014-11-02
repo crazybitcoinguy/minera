@@ -37,6 +37,7 @@ class Util_model extends CI_Model {
 		if ($this->_minerdSoftware == "bfgminer")
 		{
 			// Config for Bfgminer
+			$this->config->set_item('minerd_binary', 'bfgminer');
 			$this->config->set_item('screen_command', '/usr/bin/screen -dmS bfgminer');
 			$this->config->set_item('screen_command_stop', '/usr/bin/screen -S bfgminer -X quit');
 			$this->config->set_item('minerd_command', FCPATH.'minera-bin/bfgminer');
@@ -48,6 +49,7 @@ class Util_model extends CI_Model {
 		elseif ($this->_minerdSoftware == "cgminer")
 		{
 			// Config for Cgminer
+			$this->config->set_item('minerd_binary', 'cgminer');
 			$this->config->set_item('screen_command', '/usr/bin/screen -dmS cgminer');
 			$this->config->set_item('screen_command_stop', '/usr/bin/screen -S cgminer -X quit');
 			$this->config->set_item('minerd_command', FCPATH.'minera-bin/cgminer');
@@ -59,6 +61,7 @@ class Util_model extends CI_Model {
 		elseif ($this->_minerdSoftware == "cgdmaxlzeus")
 		{
 			// Config for Cgminer Dmal Zeus
+			$this->config->set_item('minerd_binary', 'cgminer-dmaxl-zeus');
 			$this->config->set_item('screen_command', '/usr/bin/screen -dmS cgminerdmaxlzeus');
 			$this->config->set_item('screen_command_stop', '/usr/bin/screen -S cgminerdmaxlzeus -X quit');
 			$this->config->set_item('minerd_command', FCPATH.'minera-bin/cgminer-dmaxl-zeus');
@@ -67,9 +70,34 @@ class Util_model extends CI_Model {
 			$this->config->set_item('minerd_log_url', 'application/logs/cgminerdmaxlzeus.log');
 			$this->load->model('cgminer_model', 'miner');
 		}
+		elseif ($this->_minerdSoftware == "cgAM")
+		{
+			// Config for Cgminer ASICMiner Block Erupter Fork
+			$this->config->set_item('minerd_binary', 'cgminer-AM');
+			$this->config->set_item('screen_command', '/usr/bin/screen -dmS cgAM');
+			$this->config->set_item('screen_command_stop', '/usr/bin/screen -S cgAM -X quit');
+			$this->config->set_item('minerd_command', FCPATH.'minera-bin/cgminer-AM');
+			$this->config->set_item('minerd_log_file', '/var/log/minera/cgminerAM.log');
+			$this->config->set_item('minerd_special_log', true);
+			$this->config->set_item('minerd_log_url', 'application/logs/cgminerAM.log');
+			$this->load->model('cgminer_model', 'miner');
+		}
+		elseif ($this->_minerdSoftware == "cgRM")
+		{
+			// Config for Cgminer Rockminer Fork
+			$this->config->set_item('minerd_binary', 'cgminer-RM');
+			$this->config->set_item('screen_command', '/usr/bin/screen -dmS cgminerRM');
+			$this->config->set_item('screen_command_stop', '/usr/bin/screen -S cgminerRM -X quit');
+			$this->config->set_item('minerd_command', FCPATH.'minera-bin/cgminer-RM');
+			$this->config->set_item('minerd_log_file', '/var/log/minera/cgminerRM.log');
+			$this->config->set_item('minerd_special_log', true);
+			$this->config->set_item('minerd_log_url', 'application/logs/cgminerRM.log');
+			$this->load->model('cgminer_model', 'miner');
+		}
 		elseif ($this->_minerdSoftware == "cpuminer")
 		{
 			// Config for Cpuminer-gc3355
+			$this->config->set_item('minerd_binary', 'minerd');
 			$this->config->set_item('screen_command', '/usr/bin/screen -dmS cpuminer');
 			$this->config->set_item('screen_command_stop', '/usr/bin/screen -S cpuminer -X quit');
 			$this->config->set_item('minerd_command', FCPATH.'minera-bin/minerd');
@@ -1135,7 +1163,7 @@ class Util_model extends CI_Model {
 		$minerdUser = ($this->redis->get("minerd_running_user")) ? $this->redis->get("minerd_running_user") : $this->config->item("system_user");
 
 		exec("sudo -u " . $minerdUser . " " . $this->config->item("screen_command_stop"));
-		exec("sudo -u " . $minerdUser . " /usr/bin/killall -s9 minerd");
+		exec("sudo -u " . $minerdUser . " /usr/bin/killall -s9 ".$this->config->item("minerd_binary"));
 		
 		$this->redis->del("latest_stats");
 		$this->redis->set("minerd_status", false);
@@ -1439,11 +1467,22 @@ class Util_model extends CI_Model {
 		if ($this->isEnableMobileminer())
 		{
 			$stats = json_decode($this->getParsedStats($this->getMinerStats()));
-							
+			
+			// Params		
 			$params = array("emailAddress" => $this->redis->get("mobileminer_email"), "applicationKey" => $this->redis->get("mobileminer_appkey"), "apiKey" => $this->config->item('mobileminer_apikey'), "detailed" => true);
 			
+			// Pool data
 			$poolUrl = (isset($stats->pool->url)) ? $stats->pool->url : "no pool configured";
 			$poolStatus = (isset($stats->pool->alive) && $stats->pool->alive) ? "Alive" : "Dead";
+			
+			// Algo data
+			$minerdCommand = $this->getCommandLine();
+			$scryptEnabled = $this->redis->get("minerd_scrypt");
+			$algo = "SHA-256";
+			if ($scryptEnabled || preg_match("/scrypt/i", $minerdCommand) || $this->redis->get("minerd_running_software") == "cpuminer")
+			{
+				$algo = "Scrypt";
+			}
 							
 			$i = 0; $data = array();
 			if (count($stats->devices) > 0)
@@ -1455,7 +1494,7 @@ class Util_model extends CI_Model {
 						"MinerName" => "Minera",
 						"CoinSymbol" => "",
 						"CoinName" => "",
-						"Algorithm" => "Scrypt",
+						"Algorithm" => $algo,
 						"Kind" => "Asic",
 						"Name" => $devName,
 						"FullName" => $devName,
