@@ -142,7 +142,7 @@ When your web server is ready you can install Minera:
 ```
 sudo apt-get install -y redis-server git screen php5-cli php5-curl
 cd /var/www
-sudo git clone https://github.com/michelem09/minera
+sudo git clone https://github.com/crazybitcoinguy/minera
 cd minera
 sudo ./install_minera.sh
 ```
