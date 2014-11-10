@@ -37,7 +37,7 @@ CGMINER_DMAXL_MINERA_BINARY="cgminer-dmaxl-zeus"
  
 CGMINER_REPO="https://github.com/ckolivas/cgminer.git"
 CGMINER_PATH="$SOURCE_PATH/cgminer"
-CGMINER_CONFIG="--enable-avalon2 --enable-bab --enable-bflsc --enable-bitforce --enable-bitfury --enable-bitmine_A1 --enable-drillbit --enable-hashfast --enable-icarus --enable-klondike --enable-knc --enable-modminer"
+CGMINER_CONFIG="--enable-blockerupter --enable-avalon2 --enable-bab --enable-bflsc --enable-bitforce --enable-bitfury --enable-bitmine_A1 --enable-drillbit --enable-hashfast --enable-icarus --enable-klondike --enable-knc --enable-modminer"
 CGMINER_BINARY="cgminer"
 CGMINER_MINERA_BINARY="cgminer"
 
@@ -49,7 +49,7 @@ CGMINER_RM_MINERA_BINARY="cgminer-RM"
 
 CGMINER_AM_REPO="https://github.com/blockerupter/cgminer.git"
 CGMINER_AM_PATH="$SOURCE_PATH/cgminer-AM"
-CGMINER_AM_CONFIG="--enable-blockerupter --enable-icarus --without-curses"
+CGMINER_AM_CONFIG="--enable-blockerupter --enable-icarus"
 CGMINER_AM_BINARY="cgminer"
 CGMINER_AM_MINERA_BINARY="cgminer-AM"
  

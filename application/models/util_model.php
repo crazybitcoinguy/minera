@@ -370,7 +370,7 @@ class Util_model extends CI_Model {
 				$return['totals']['hashrate'] = $tdhashrate;
 				$return['totals']['last_share'] = $totals->{'Last getwork'};
 				
-				if ($this->_minerdSoftware == "cgdmaxlzeus")
+				if ($this->_minerdSoftware == "cgdmaxlzeus" || $this->_minerdSoftware == "cgAM" || $this->_minerdSoftware == "cgminer")
 					$cgbfgminerPoolHashrate = round($totals->{'Total MH'} / $totals->Elapsed * 1000000); //round(65536.0 * ($totals->{'Difficulty Accepted'} / $totals->Elapsed), 0); //round(($totals->{'Network Blocks'}*71582788/1000), 0);
 				else
 					$cgbfgminerPoolHashrate = round(($totals->{'Work Utility'}*71582788), 0);
